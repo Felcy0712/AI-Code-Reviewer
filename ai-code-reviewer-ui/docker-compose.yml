@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: .
+    container_name: ai-code-reviewer-backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/app/data/chroma
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  chroma_data:

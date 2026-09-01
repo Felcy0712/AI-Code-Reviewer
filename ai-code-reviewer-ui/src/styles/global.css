@@ -1,0 +1,37 @@
+/* Remove Chrome autofill background */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #111827 inset !important;
+    -webkit-text-fill-color: #F9FAFB !important;
+    caret-color: #F9FAFB;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+:root {
+  --bg-color: #111827;
+  --sidebar-color: #1F2937;
+  --card-color: #374151;
+
+  --primary: #F97316;
+  --primary-hover: #FB923C;
+
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+
+  --border-color: #4B5563;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-family: Inter, Arial, sans-serif;
+}
