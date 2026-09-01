@@ -11,6 +11,7 @@ from app.config import (
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import UserResponse
+from app.config import FRONTEND_URL
 
 
 router = APIRouter(
