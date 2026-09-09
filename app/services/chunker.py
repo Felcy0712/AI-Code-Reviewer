@@ -1,8 +1,11 @@
-def chunk_code(text: str, chunk_size=500):
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-    chunks = []
 
-    for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i + chunk_size])
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=50,
+)
 
-    return chunks
+
+def chunk_code(text: str) -> list[str]:
+    return text_splitter.split_text(text)

@@ -1,14 +1,15 @@
-import chromadb
+from langchain_chroma import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
 
-from app.services.embedding_service import generate_embedding
 
-
-client = chromadb.PersistentClient(
-    path="data/chroma"
+embedding_function = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-collection = client.get_or_create_collection(
-    name="code_embeddings"
+vector_store = Chroma(
+    collection_name="code_embeddings",
+    persist_directory="data/chroma",
+    embedding_function=embedding_function,
 )
 
 
@@ -16,12 +17,13 @@ def search_code(
     query: str,
     project_id: int,
 ):
-    query_embedding = generate_embedding(query)
-
-    return collection.query(
-        query_embeddings=[query_embedding],
-        n_results=10,
-        where={
-            "project_id": project_id
-        },
+    retriever = vector_store.as_retriever(
+        search_kwargs={
+            "k": 10,
+            "filter": {
+                "project_id": project_id
+            },
+        }
     )
+
+    return retriever.invoke(query)

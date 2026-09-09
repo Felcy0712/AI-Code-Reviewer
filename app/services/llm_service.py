@@ -1,18 +1,21 @@
-from google import genai
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+
 
 load_dotenv()
 
-client = genai.Client(
-    api_key=os.getenv("GOOGLE_API_KEY")
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0,
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
 )
 
 
-
-def review_code(code: str):
-
-    prompt = f"""
+prompt = ChatPromptTemplate.from_template(
+    """
 You are a Senior Software Engineer.
 
 Review the following code.
@@ -25,14 +28,15 @@ Provide:
 Code:
 {code}
 """
+)
+
+
+def review_code(code: str) -> str:
+    chain = prompt | llm
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-
-        return response.text
+        response = chain.invoke({"code": code})
+        return response.content
 
     except Exception as e:
         print(f"Gemini API error: {e}")

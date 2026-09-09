@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from authlib.integrations.starlette_client import OAuth
@@ -111,22 +111,43 @@ async def google_callback(
 def get_current_user_info(
     request: Request,
 ):
+    response = {
+        "authenticated": False,
+        "user_id": 0,
+        "email": "",
+    }
     user_id = request.session.get("user_id")
     email = request.session.get("email")
 
-    if not user_id:
+    if user_id:
+        response = {
+            "authenticated": True,
+            "user_id": user_id,
+            "email": email or "",
+        }
+
+    return JSONResponse(
+        content=response,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
+
+    """if not user_id:
         return {
             "authenticated": False,
             "user_id": 0,
             "email": "",
-        }
+        }"""
 
-    return {
+    """return {
         "authenticated": True,
         "user_id": user_id,
         "email": email or "",
-    }
-
+    }"""
+    
 
 @router.post("/logout")
 def logout(request: Request):

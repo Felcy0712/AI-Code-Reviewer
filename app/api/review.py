@@ -14,7 +14,6 @@ router = APIRouter()
 @router.get(
     "/review/{review_id}",
     response_model=ReviewResponse,
-    #We no longer manually build:{"id": ..., "project_id": ..., ...}Pydantic handles the response shape.
 )
 def get_review(
     review_id: int,
@@ -40,3 +39,25 @@ def get_review(
         )
 
     return review
+
+@router.get(
+    "/reviews",
+    response_model=list[ReviewResponse],
+)
+def get_reviews(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    reviews = (
+        db.query(Review)
+        .join(Review.project)
+        .filter(
+            Review.project.has(
+                user_id=current_user.id
+            )
+        )
+        .order_by(Review.id.desc())
+        .all()
+    )
+
+    return reviews

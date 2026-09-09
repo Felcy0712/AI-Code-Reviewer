@@ -1,75 +1,56 @@
-# AI Code Reviewer
+# AI Code Reviewer — Project Overview
 
-AI Code Reviewer is a web application that analyzes uploaded codebases and generates AI-powered code reviews.
+AI Code Reviewer is a web application where a developer uploads a ZIP of source code, and the system analyzes the code and generates an AI-powered code review covering bugs, code quality, and improvements.
 
-Users authenticate with Google, upload a ZIP project, and receive an AI-generated review based on retrieved code context.
+# Tech Stack
+Frontend - React, Vite, React Router, Axios
+Backend -	Python 3.11, FastAPI, Pydantic
+Database - PostgreSQL, SQLAlchemy
+Authentication - Google OAuth/OIDC, session cookies
+RAG - LangChain, ChromaDB
+Embeddings - Hugging Face all-MiniLM-L6-v2
+LLM - Google Gemini
+Container - Docker
+Cloud/K8s	Planned
 
-## Architecture
-
-```text
-React + Vite
-     ↓
+# Product Flow
+User
+ ↓
+React UI
+ ↓
+Google Login
+ ↓
 FastAPI
-     ↓
-Google OAuth / Session
-     ↓
-PostgreSQL
-     ↓
-Code Processing
-     ↓
-Embeddings
-     ↓
-ChromaDB
-     ↓
-RAG Retrieval
-     ↓
-Google Gemini
-     ↓
-AI Code Review
+ ↓
+Session authentication
+ ↓
+Upload ZIP
+ ↓
+Extract + read source files
+ ↓
+LangChain splits code into chunks
+ ↓
+Hugging Face creates embeddings
+ ↓
+ChromaDB stores chunks + vectors + project_id
+ ↓
+Retriever gets relevant project chunks
+ ↓
+LangChain Prompt
+ ↓
+Gemini
+ ↓
+AI Review
+ ↓
+PostgreSQL stores review
+ ↓
+review_id returned to React
+ ↓
+React requests /review/{review_id}
+ ↓
+Review displayed in UI
 
-Features :
-Google OAuth authentication
-Session-based authentication
-ZIP project upload
-Source-code extraction and processing
-Code chunking
-Embedding generation
-ChromaDB vector storage
-Project-specific RAG retrieval
-Gemini-powered code review
-PostgreSQL project and review persistence
-Dashboard with project/review statistics
-Review history
-Protected project/review APIs
-Dockerized FastAPI backend
-Tech Stack
-Frontend
-React
-Vite
-React Router
-Axios
-JavaScript
-CSS
-Lucide React
-Backend
-Python 3.11
-FastAPI
-Uvicorn
-Pydantic
-SQLAlchemy
-Authlib
-Starlette SessionMiddleware
-Database / AI
-PostgreSQL
-ChromaDB
-Sentence Transformers
-Google Gemini
-Deployment
-Docker
-Vercel for frontend
-Azure for backend/cloud infrastructure
-Kubernetes planned for container orchestration
-Project Structure
+# Project Structure
 AI-Code-Reviewer/
 │
 ├── app/
@@ -112,113 +93,18 @@ AI-Code-Reviewer/
 ├── .dockerignore
 ├── requirements.txt
 └── README.md
-Authentication Flow
-React
-  ↓
-Google Login
-  ↓
-FastAPI OAuth callback
-  ↓
-Find/Create user in PostgreSQL
-  ↓
-Session created
-  ↓
-Signed session cookie
-  ↓
-Protected API access
 
-The application uses Google OAuth/OIDC with session-based authentication.
+# How to Test Locally
 
-JWT is not used in the current architecture.
+1. Start PostgreSQL.
 
-Upload and Review Flow
-User
- ↓
-Upload ZIP
- ↓
-POST /upload
- ↓
-Authenticate current user
- ↓
-Create Project
- ↓
-Extract ZIP
- ↓
-Read source files
- ↓
-Chunk code
- ↓
-Generate embeddings
- ↓
-Store vectors in ChromaDB
- ↓
-Retrieve project-specific chunks
- ↓
-Send retrieved context to Gemini
- ↓
-Generate review
- ↓
-Save Review in PostgreSQL
- ↓
-Mark Project completed
- ↓
-Return project_id + review_id
- ↓
-React opens /review/{review_id}
-Project Isolation
+2. Start backend: python -m uvicorn app.main:app --reload
 
-Every ChromaDB chunk contains project metadata:
+Backend: http://localhost:8000
 
-project_id
-file_name
-chunk_index
+Swagger: http://localhost:8000/docs
 
-Retrieval is filtered using the current project ID so code from another project is not returned during review.
-
-Database Model
-users
-  │
-  └── projects
-          │
-          └── reviews
-Users
-
-Stores authenticated application users.
-
-Projects
-
-Stores uploaded project information and processing status.
-
-Reviews
-
-Stores AI-generated review results associated with a project.
-
-Local Development
-Backend
-
-Create and activate the virtual environment:
-
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-Install dependencies:
-
-python -m pip install -r requirements.txt
-
-Run FastAPI:
-
-python -m uvicorn app.main:app --reload
-
-Backend:
-
-http://localhost:8000
-
-Swagger:
-
-http://localhost:8000/docs
-Frontend
-
-From the React project directory:
+3. Start frontend:
 
 npm install
 npm run dev
@@ -226,68 +112,36 @@ npm run dev
 Frontend:
 
 http://localhost:5173
-Environment Variables
 
-Backend .env:
+4. Test the product: 
+Open:  http://localhost:5173
+Then:
 
-DATABASE_URL=
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-SESSION_SECRET=
-GEMINI_API_KEY=
-FRONTEND_URL=http://localhost:5173
+# Google Login
+→ Dashboard
+→ Upload sample_project.zip
+→ AI review generated
+→ Review page
+→ History
 
-Frontend:
-
-VITE_API_URL=http://localhost:8000
-
-Docker : 
-Build the backend image:
-
+# Docker Test
+Build: 
 docker build -t ai-code-reviewer .
 
-Run it:
-
+Run:
 docker run --name ai-code-reviewer `
   --env-file .env `
   -p 8000:8000 `
   -v ai-code-reviewer-chroma:/app/data/chroma `
   ai-code-reviewer
 
-The Docker image contains the FastAPI application and Python dependencies.
+Then use the same frontend at:
+http://localhost:5173
 
-ChromaDB data is stored in a persistent Docker volume.
+# Key Architecture Concept
 
-API Endpoints
-Authentication
-GET  /auth/google/login
-GET  /auth/google/callback
-GET  /auth/me
-POST /auth/logout
-Projects
-GET /projects
-GET /dashboard/stats
-Upload
-POST /upload
-Reviews
-GET /review/{review_id}
-GET /reviews
-Health
-GET /health
-Deployment
+PostgreSQL stores application data such as users, projects, and reviews.
 
-Planned production architecture:
+ChromaDB stores code chunks, embeddings, and metadata for semantic retrieval.
 
-User
- ↓
-Vercel
- ↓
-React frontend
- ↓ HTTPS
-Azure Container Apps
- ↓
-FastAPI Docker container
- ├── Azure PostgreSQL
- ├── Persistent Chroma storage
- └── Gemini API
-
+LangChain connects the RAG components; Hugging Face creates embeddings, and Gemini generates the final review.

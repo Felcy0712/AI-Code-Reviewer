@@ -10,7 +10,9 @@ export default function ProtectedRoute({ children }) {
     const checkAuth = async () => {
       try {
         const user = await getCurrentUser();
+        console.log("AUTH CHECK:", user);
         setAuthenticated(user.authenticated === true);
+
       } catch {
         setAuthenticated(false);
       } finally {

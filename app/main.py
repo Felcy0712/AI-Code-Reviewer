@@ -19,7 +19,7 @@ app = FastAPI(
 app.add_middleware(
     SessionMiddleware,
     secret_key=SESSION_SECRET_KEY,
-    https_only=True,   # True when deployed with HTTPS
+    https_only=False,   # True when deployed with HTTPS
     same_site="lax",
 )
 
