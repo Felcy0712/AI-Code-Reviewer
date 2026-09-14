@@ -66,4 +66,12 @@ export const getReviews = async () => {
   return response.data;
 };
 
+export const getEvaluationDashboard = async () => {
+  const response = await api.get(
+    "/evaluations/dashboard"
+  );
+
+  return response.data;
+};
+
 export default api;

@@ -62,6 +62,11 @@ export default function Sidebar() {
       label: "Review History",
       icon: Clock3,
     },
+    {
+      to: "/evaluation",
+      label: "Evaluation",
+      icon: Activity,
+    },
   ];
 
   return (

@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Review from "./pages/Review";
 import History from "./pages/History";
+import Evaluation from "./pages/Evaluation";
 
 
 export default function App() {
@@ -74,6 +75,13 @@ export default function App() {
             replace
           />
         }
+      />
+
+      <Route
+        path="/evaluation"
+        element={protectedPage(
+          <Evaluation />
+        )}
       />
     </Routes>
   );

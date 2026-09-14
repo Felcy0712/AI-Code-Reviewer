@@ -1,6 +1,8 @@
 # AI Code Reviewer — Project Overview
 
-AI Code Reviewer is a web application where a developer uploads a ZIP of source code, and the system analyzes the code and generates an AI-powered code review covering bugs, code quality, and improvements.
+AI Code Reviewer is a full-stack web application that allows developers to upload a ZIP-based source code project and generate an AI-powered code review.
+
+The system uses a Retrieval-Augmented Generation (RAG) pipeline to retrieve relevant source-code context before sending it to Google Gemini. Reviews are persisted in PostgreSQL and automatically evaluated using an LLM-as-a-Judge evaluation layer.
 
 # Tech Stack
 Frontend - React, Vite, React Router, Axios
@@ -12,6 +14,33 @@ Embeddings - Hugging Face all-MiniLM-L6-v2
 LLM - Google Gemini
 Container - Docker
 Cloud/K8s	Planned
+
+Review Modes
+
+The application supports two review modes.
+
+1. Entire Project Review
+
+The complete uploaded project is processed.
+The system:
+Extracts the ZIP
+Reads supported source files
+Splits source code into chunks
+Generates embeddings
+Stores chunks and metadata in ChromaDB
+Retrieves relevant project context
+Generates an AI code review
+
+
+2. Single File Review
+
+The user can select a specific source file from the uploaded ZIP.
+The frontend reads the ZIP using JSZip and displays supported source files for selection.
+The selected file is then sent to the backend using:
+review_mode=file
+selected_file=<filename>
+
+The backend validates that the selected file actually exists in the uploaded project before processing it.
 
 # Product Flow
 User
@@ -50,6 +79,38 @@ React requests /review/{review_id}
  ↓
 Review displayed in UI
 
+
+# AI Evaluation
+
+LLM-as-a-Judge Evaluation
+ ├── Correctness
+ ├── Relevance 
+ ├── Completeness 
+ ├── Severity Accuracy 
+ ├── Groundedness 
+ └── Hallucination 
+ ↓ Latency + LLM Cost Tracking 
+ ↓ PostgreSQL 
+    └── Evaluation
+
+
+# Pages & Functionality
+Login : Google OAuth/OIDC login
+![alt text](images/Login.png)
+
+Dashboard : Overview of projects and reviews
+![alt text](images/Dashboard.png)
+
+Upload : Upload ZIP source-code projects
+[text](README.md) ![text](images/Review_History.png) ![text](images/Upload.png)
+
+Review : Display AI-generated code review
+
+History : Display previous code reviews, Access individual review results
+[text](README.md) ![text](images/Review_History.png)
+AI Evaluation: Display AI review quality metrics:
+![alt text](images/Evaluation.png)
+
 # How to Test Locally
 
 1. Start PostgreSQL.
@@ -72,13 +133,6 @@ http://localhost:5173
 4. Test the product: 
 Open:  http://localhost:5173
 Then:
-
-# Google Login
-→ Dashboard
-→ Upload sample_project.zip
-→ AI review generated
-→ Review page
-→ History
 
 # Docker Test
 Build: 

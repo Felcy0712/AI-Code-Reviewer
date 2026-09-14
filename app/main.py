@@ -9,6 +9,8 @@ from app.api import review
 from app.config import SESSION_SECRET_KEY
 from app.config import FRONTEND_URL
 
+from app.api import evaluation
+
 
 app = FastAPI(
     title="AI Code Reviewer API",
@@ -35,6 +37,7 @@ app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(project.router)
 app.include_router(review.router)
+app.include_router(evaluation.router)
 
 @app.get("/")
 def home():

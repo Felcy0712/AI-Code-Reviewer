@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
 from sqlalchemy import (
     Column,
@@ -38,4 +39,11 @@ class Review(Base):
         DateTime,
         nullable=False,
         default=datetime.utcnow,
+    )
+
+    evaluation = relationship(
+    "Evaluation",
+    back_populates="review",
+    uselist=False,
+    cascade="all, delete-orphan",
     )
